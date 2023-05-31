@@ -1,5 +1,5 @@
 # Retail Sales EDA and Spending Predictions
-This repository holds data used for the project, Jupyter Notebook and Python file.
+This repository holds data used for the project, Jupyter Notebook and Python script.
 
 Additionally, you can check the full notebook on Kaggle  https://www.kaggle.com/code/anastasiyaigonina/retail-sales-eda-and-spending-predictions
 
