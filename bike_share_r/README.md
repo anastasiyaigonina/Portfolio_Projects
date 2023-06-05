@@ -1,9 +1,12 @@
 # Cyclistic Case Study: Data Analysis with R
+
+This project aims to provide valuable insights and recommendations for a bike-sharing company based on a thorough data analysis process. By following the data analysis process, including asking questions, preparing the data, processing and analyzing it, sharing the findings, and suggesting actions, we have uncovered valuable information to support business decision-making.
+
 This repository contains Jupyter Notebook as well as R script.
 
-Additionally, you can check the comprehensive notebook and explore an interactive map here https://www.kaggle.com/code/anastasiyaigonina/cyclistic-case-study-data-analysis-with-r
+Additionally, you can check the comprehensive notebook and explore an interactive map here: https://www.kaggle.com/code/anastasiyaigonina/cyclistic-case-study-data-analysis-with-r
 
-# About Dataset
+## About Dataset
 
 In 2016, Cyclistic launched a successful bike-share offering. Since then, the program has grown to a fleet of 5,824 bicycles that are geotracked and locked into a network of 692 stations across Chicago. The bikes can be unlocked from one station and returned to any other station in the system anytime.
 
