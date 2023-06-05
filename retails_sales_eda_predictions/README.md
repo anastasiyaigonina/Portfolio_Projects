@@ -1,9 +1,12 @@
-# Retail Sales EDA and Spending Predictions
-This repository holds data used for the project, Jupyter Notebook and Python script.
+# Retail Sales EDA and Spending Predictions with Python
+
+This project focuses on analyzing retail sales data in Istanbul. It involves data preparation and cleaning, exploratory data analysis (EDA), and building predictive models to forecast customer spending based on various variables. Furthermore, the project explores the correlation between total revenue and currency rates.
+
+The repository holds data used for the project, Jupyter Notebook and Python script.
 
 Additionally, you can check the full notebook on Kaggle  https://www.kaggle.com/code/anastasiyaigonina/retail-sales-eda-and-spending-predictions
 
-# About Dataset
+## About Dataset
 Welcome to the shopping world of Istanbul! Our dataset contains shopping information from 10 different shopping malls between 2021 and 2023. We have gathered data from various age groups and genders to provide a comprehensive view of shopping habits in Istanbul. The dataset includes essential information such as invoice numbers, customer IDs, age, gender, payment methods, product categories, quantity, price, order dates, and shopping mall locations. We hope that this dataset will serve as a valuable resource for researchers, data analysts, and machine learning enthusiasts who want to gain insights into shopping trends and patterns in Istanbul. Explore the dataset and discover the fascinating world of Istanbul shopping!
 * invoice_no: Invoice number. Nominal. A combination of the letter 'I' and a 6-digit integer uniquely assigned to each operation.
 * customer_id: Customer number. Nominal. A combination of the letter 'C' and a 6-digit integer uniquely assigned to each operation.
