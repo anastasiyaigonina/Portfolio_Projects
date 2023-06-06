@@ -15,7 +15,7 @@ This project focuses on the analysis of diabetes medical data and building predi
 
 This project focuses on analyzing hotel reviews using data analysis techniques, sentiment analysis, prediction modeling, topic modeling, and negative reviews clustering. The goal is to gain insights from the reviews, predict sentiment, identify key topics, and group similar negative reviews. The findings contribute to improving customer satisfaction and decision-making processes in the hotel industry.
 
-## [Cyclistic Case Study: Data Analysis with R](https://github.com/igonina-anastasi/Portfolio_Projects/tree/main/bike_share_r)
+## [Cyclistic Case Study: Data Analysis with R](https://github.com/igonina-anastasi/Portfolio_Projects/tree/main/cyclistic_case_study_r)
 
 This project aims to provide valuable insights and recommendations for a bike-sharing company based on a thorough data analysis process. By following the data analysis process, including asking questions, preparing the data, processing and analyzing it, sharing the findings, and suggesting actions, we have uncovered valuable information to support business decision-making.
 
