@@ -2,7 +2,7 @@
 
 This repository contains a collection of 6 projects. Each project focuses on different aspects of data analysis, using diverse data analysis tools and programming languages, and provides unique insights and solutions to various problems.
 
-## [Retail Sales EDA and Spending Predictions with Python](https://github.com/igonina-anastasi/Portfolio_Projects/tree/main/retails_sales_eda_predictions)
+## [Retail Sales: EDA and Spending Predictions with Python](https://github.com/igonina-anastasi/Portfolio_Projects/tree/main/retails_sales_eda_predictions)
 
 This project focuses on analyzing retail sales data in Istanbul. It involves data preparation and cleaning, exploratory data analysis (EDA), and building predictive models to forecast customer spending based on various variables. Furthermore, the project explores the correlation between total revenue and currency rates.
 
