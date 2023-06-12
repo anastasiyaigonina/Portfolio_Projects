@@ -8,6 +8,7 @@ library(readr)
 library(janitor)
 library(scales)
 library(leaflet)
+library(htmlwidgets)
 
 
 # Load data 
@@ -259,3 +260,6 @@ map <- map %>%
   )
 
 map
+
+# Save map
+saveWidget(map, file="map.html")
