@@ -4,6 +4,8 @@ This project focuses on analyzing hotel reviews using data analysis techniques, 
 
 This repository contains data csv file, Jupyter Notebook as well as Python script.
 
+<img src="reviews_screenshot.png" width="600">
+
 Additionally, you can check the comprehensive notebook and explore an interactive topic modeling visualization here https://www.kaggle.com/code/anastasiyaigonina/reviews-sentiment-topic-modeling-clustering?scriptVersionId=132366499 
 
 ## About Dataset
