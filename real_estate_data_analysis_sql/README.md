@@ -4,7 +4,7 @@ This project aims to analyze real estate data in the USA using SQL and create an
 
 The repository contains CSV data file, SQL queries, Jupyter Notebook, and an interactive Tableau dashboard. 
 
-![Screenshot](tableau_screenshot.png)
+<img src="tableau_screenshot.png" width="600">
 
 Additionally, you can explore the complete dashboard by visiting the following link: https://public.tableau.com/app/profile/anastasiya.igonina/viz/USARealEstateDataAnalysis/Dashboard
 
