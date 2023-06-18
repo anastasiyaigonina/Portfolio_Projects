@@ -4,6 +4,8 @@ This project aims to analyze real estate data in the USA using SQL and create an
 
 The repository contains CSV data file, SQL queries, Jupyter Notebook, and an interactive Tableau dashboard. 
 
+![Screenshot](tableau_screenshot.png)
+
 Additionally, you can explore the complete dashboard by visiting the following link: https://public.tableau.com/app/profile/anastasiya.igonina/viz/USARealEstateDataAnalysis/Dashboard
 
 Kaggle Notebook: https://www.kaggle.com/code/anastasiyaigonina/real-estate-data-analysis-using-sql
