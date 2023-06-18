@@ -4,6 +4,8 @@ This project aims to perform a comprehensive exploratory data analysis on variou
 
 This repository holds data used for the project, Jupyter Notebook, and R script.
 
+<img src="insurance_charges_screenshot.jpg" width="600">
+
 Additionally, you can check the full notebook on Kaggle  https://www.kaggle.com/code/anastasiyaigonina/insurance-charges-eda-and-predictions-with-r/
 
 
