@@ -4,6 +4,8 @@ This project aims to provide valuable insights and recommendations for a bike-sh
 
 This repository contains Jupyter Notebook as well as R script.
 
+<img src="cyclistic_screenshot.png" width="600">
+
 Additionally, you can check the comprehensive notebook and explore an interactive map here: https://www.kaggle.com/code/anastasiyaigonina/cyclistic-case-study-data-analysis-with-r
 
 ## About Dataset
