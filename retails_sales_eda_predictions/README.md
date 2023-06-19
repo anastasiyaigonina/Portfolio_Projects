@@ -4,6 +4,8 @@ This project focuses on analyzing retail sales data in Istanbul. It involves dat
 
 The repository holds data used for the project, Jupyter Notebook and Python script.
 
+<img src="retail_screenshot.png" width="600">
+
 Additionally, you can check the full notebook on Kaggle  https://www.kaggle.com/code/anastasiyaigonina/retail-sales-eda-and-spending-predictions
 
 ## About Dataset
