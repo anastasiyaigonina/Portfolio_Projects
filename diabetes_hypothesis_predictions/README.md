@@ -4,6 +4,8 @@ This project focuses on the analysis of diabetes medical data and building predi
 
 This repository contains data used for the project, Jupiter Notebook as long as Python script. 
 
+<img src="diabetes_screenshot.png" width="600">
+
 Additionally, you can access the complete notebook on Kaggle https://www.kaggle.com/code/anastasiyaigonina/diabetes-eda-hypothesis-testing-predictions
 
 ## About Dataset
