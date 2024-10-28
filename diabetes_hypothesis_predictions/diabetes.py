@@ -4,17 +4,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 from scipy.stats import chi2_contingency
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.feature_selection import SelectKBest, chi2 
+from imblearn.under_sampling import NearMiss
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from xgboost import XGBClassifier
+from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score
 
 # Load the dataset
-df = pd.read_csv('diabetes_binary_5050split_health_indicators_BRFSS2015.csv')
+df = pd.read_csv('diabetes_binary_health_indicators_BRFSS2015.csv')
 print(df.head())
 
 # Check info about dataset
@@ -56,8 +60,8 @@ ax.set_xticklabels(['No diabetes', 'Diabetic'])
 plt.ylim(15, 60)
 plt.show()
 
-# There are some binary columns that we can visually compare data between no-diabetes and diabetics.
-# Let us iterate from those columns and build plots in one go.
+# There are some binary columns that we can visualy compare data between no-diabetes and diabetics.
+# Lets iterate from those columns and build plots in one go.
 
 col_names = ['HighChol', 'HighBP', 'Smoker', 'HvyAlcoholConsump', 'PhysActivity', 'DiffWalk']
 a = 3  # number of rows
@@ -65,14 +69,14 @@ b = 2  # number of columns
 c = 1  # plot counter
 
 fig = plt.figure(figsize=(12, 15))
-for i in col_names:
+for col in col_names:
     plt.subplot(a, b, c)
-    ax = sns.countplot(data=df, x=i, hue='Diabetes_binary', palette='Set2')
-    ax.set(title='{}'.format(i))
-    ax.set(xlabel=None)
-    ax.set_xticklabels(['No', 'Yes'])
-    ax.legend(['No-diabetes', 'Diabetics'])
-    c = c + 1
+    ax = sns.countplot(data=df, x='Diabetes_binary', hue=col, palette='Set2')
+    ax.set(title=f'Count of Diabetes Status by {col}', xlabel='Diabetes Status', ylabel='Count')
+    ax.set_xticklabels(['No Diabetes', 'Diabetes'])
+    ax.legend(title=col)
+    c += 1  
+plt.tight_layout()
 plt.show()
 
 # Create a correlation matrix
@@ -88,6 +92,7 @@ plt.show()
 # 1. Do no-diabetes and diabetics have the same BMI?
 # H0 - no-diabetes and diabetics have the same average BMI.
 # Ha - no-diabetes and diabetics have different average BMI.
+
 # Let us prepare dataset
 df_no_bmi = df_no['BMI']
 df_yes_bmi = df_yes['BMI']
@@ -103,7 +108,7 @@ plt.title('BMI distribution')
 plt.legend(['Diabetics', 'No-diabetes'])
 plt.show()
 
-# Now use the ttest since we use one numeric, one categorical variable
+# Now use the ttest since we compare the means of two independent groups
 ttest, p_value_1 = stats.ttest_ind(df_yes_bmi, df_no_bmi)
 if p_value_1 < 0.05:
     print('Reject Null Hypothesis')
@@ -130,7 +135,7 @@ plt.show()
 print('Average days of poor physical health for diabetics is {} and no-diabetics is {} '.format(df_yes_ph.mean(),
                                                                                                 df_no_ph.mean()))
 
-# Use ttest
+# Use t-test to compare the means of two independent groups
 ttest, p_value_2 = stats.ttest_ind(df_yes_ph, df_no_ph)
 if p_value_2 < 0.05:
     print('Reject Null Hypothesis')
@@ -153,7 +158,8 @@ ax.legend(['No High Cholesterol', 'High Cholesterol'])
 plt.title('High cholesterol proportion across diabetics and no-diabetes')
 plt.show()
 
-# Since we have two categorical variables,we will use chi2 test
+# Since we are trying to determine whether there is a significant association 
+# between two categorical variables,we will use chi2 test
 chi2, p_value_3, dof, exp_freq = chi2_contingency(contingency)
 if p_value_3 < 0.05:
     print('Reject Null Hypothesis')
@@ -176,7 +182,7 @@ ax.legend(['No High BP', 'High BP'])
 plt.title('High blood pressure proportion across diabetics and no-diabetes')
 plt.show()
 
-# Chi2 test for two categorical variables
+## Chi2 test for testing relationships between two categorical variables
 chi2, p_value_4, dof, exp_freq = chi2_contingency(contingency2)
 if p_value_4 < 0.05:
     print('Reject Null Hypothesis')
@@ -184,74 +190,248 @@ else:
     print('Failed to reject Null Hypothesis')
 
 # Predictions
-# Choose columns for model
-df_model = df[
-    ['Diabetes_binary', 'HighBP', 'HighChol', 'BMI', 'GenHlth', 'DiffWalk', 'Age', 'HeartDiseaseorAttack', 'PhysHlth']]
+# Feature selection 
 
-# Train test split
-X = df_model.drop('Diabetes_binary', axis=1)
-y = df_model['Diabetes_binary']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=5)
+# Define features and target
+X = df.drop('Diabetes_binary', axis=1) 
+y = df['Diabetes_binary']
+
+# Feature selection using SelectKBest with Chi-Square
+selector = SelectKBest(score_func=chi2, k=12)
+X_new = selector.fit_transform(X, y)
+
+# Get the selected feature indices
+selected_columns = selector.get_support(indices=True)
+important_features = X.columns[selected_columns].tolist()
+
+# Display the selected features
+print(important_features)
+
+# Create a DataFrame for the selected features
+X_selected = pd.DataFrame(X_new, columns=important_features)
+
+# Handling class imbalance
+
+# Handling class imbalance using NearMiss to undersample the majority class
+nm = NearMiss(version = 1 , n_neighbors = 10)
+X_sm,y_sm= nm.fit_resample(X_selected,y)
+
+# Splitting the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_sm, y_sm, test_size=0.2, random_state=42)
+
+# Scaling 
+
+# Standardizing the features (important for models sensitive to feature scaling)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Modeling
+
+# Lets start with Logistic Regression
+# Creating and training the logistic regression model
+logistic_model = LogisticRegression(random_state=42, max_iter=200)
+
+# Train model using scaled data
+logistic_model.fit(X_train_scaled, y_train)
+
+# Making predictions on the test set
+y_pred_logistic = logistic_model.predict(X_test_scaled)
+
+# Evaluating the model
+accuracy_logistic = accuracy_score(y_test, y_pred_logistic)
+class_report_logistic = classification_report(y_test, y_pred_logistic)
+
+# Output the evaluation results
+print(f"Accuracy of Logistic Regression Model: {accuracy_logistic:.3f}")
+print("Classification Report:")
+print(class_report_logistic)
+
+# K-Neighbors
+# Initialize the KNN classifier with a specified number of neighbors (k)
+knn_model = KNeighborsClassifier(n_neighbors=5)
+
+# Train the model on scaled data to improve performance
+knn_model.fit(X_train_scaled, y_train)
+
+# Make predictions on the test set
+y_pred_knn = knn_model.predict(X_test_scaled)
+
+# Evaluate the model
+accuracy_knn = accuracy_score(y_test, y_pred_knn)
+class_report_knn = classification_report(y_test, y_pred_knn)
+
+# Output the evaluation results
+print(f"KNN Accuracy: {accuracy_knn:.3f}")
+print("Classification Report:")
+print(class_report_knn)
 
 # Decision Tree
-model_1 = DecisionTreeClassifier()
-model_1.fit(X_train, y_train)
+# Initialize the Decision Tree classifier
+decision_tree_model = DecisionTreeClassifier(random_state=42, max_depth= 12)
 
-# Calculate model performance
-predictions = model_1.predict(X_test)
-model_1_score = accuracy_score(y_test, predictions)
-print('Accuracy score for Decision Tree is', model_1_score)
+# Train the model
+decision_tree_model.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred_tree = decision_tree_model.predict(X_test)
+
+# Evaluate the model
+accuracy_tree = accuracy_score(y_test, y_pred_tree)
+class_report_tree = classification_report(y_test, y_pred_tree)
+
+# Output the evaluation results
+print(f"Decision Tree Accuracy: {accuracy_tree:.3f}")
+print("Classification Report:")
+print(class_report_tree)
 
 # Random Forest
-model_2 = RandomForestClassifier()
-model_2.fit(X_train, y_train)
+# Building the Random Forest model
+random_forest_model = RandomForestClassifier(n_estimators=100, max_depth=12, random_state=42)
 
-# Calculate model performance
-predictions = model_2.predict(X_test)
-model_2_score = accuracy_score(y_test, predictions)
-print('Accuracy score for Random Forest is', model_2_score)
+# Train the model 
+random_forest_model.fit(X_train, y_train)
 
-# XGB
-model_3 = XGBClassifier()
-model_3.fit(X_train, y_train)
+# Making predictions on the test set
+y_pred_random_forest = random_forest_model.predict(X_test)
 
-# Calculate model performance
-predictions = model_3.predict(X_test)
-model_3_score = accuracy_score(y_test, predictions)
-print('Accuracy score for XGB is', model_3_score)
+# Evaluating the model
+accuracy_random_forest = accuracy_score(y_test, y_pred_random_forest)
+class_report_random_forest = classification_report(y_test, y_pred_random_forest)
 
-# SVC
-model_4 = SVC()
-model_4.fit(X_train, y_train)
+# Output the evaluation results
+print(f"Accuracy for Random Forest: {accuracy_random_forest:.3f}")
+print("Classification Report:")
+print(class_report_random_forest)
 
-# Calculate model performance
-predictions = model_4.predict(X_test)
-model_4_score = accuracy_score(y_test, predictions)
-print('Accuracy score for SVC is', model_4_score)
+# Support Vector Machine
+# Building the SVM model
+svm_model = SVC(random_state=42, C=1.0)  
 
-# KNeighbors
-model_5 = KNeighborsClassifier()
-model_5.fit(X_train, y_train)
+# Train using scaled data
+svm_model.fit(X_train_scaled, y_train)
 
-# Calculate model performance
-predictions = model_5.predict(X_test)
-model_5_score = accuracy_score(y_test, predictions)
-print('Accuracy score for KNeighbors is', model_5_score)
+# Making predictions on the test set
+y_pred_svm = svm_model.predict(X_test_scaled)
 
-# MLP
-model_6 = MLPClassifier()
-model_6.fit(X_train, y_train)
+# Evaluating the model
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+class_report_svm = classification_report(y_test, y_pred_svm)
 
-# Calculate model performance
-predictions = model_6.predict(X_test)
-model_6_score = accuracy_score(y_test, predictions)
-print('Accuracy score for MLP is', model_6_score)
+# Output the evaluation results
+print(f"Accuracy of SVM Model: {accuracy_svm:.3f}")
+print("Classification Report:")
+print(class_report_svm)
+
+# Multi-Layer Perceptron
+# Initialize the MLP classifier
+mlp_model = MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=300, random_state=42)
+
+# Train the model using scaled data
+mlp_model.fit(X_train_scaled, y_train)
+
+# Make predictions on the test set
+y_pred_mlp = mlp_model.predict(X_test_scaled)
+
+# Evaluate the model
+accuracy_mlp = accuracy_score(y_test, y_pred_mlp)
+class_report_mlp = classification_report(y_test, y_pred_mlp)
+
+# Output the evaluation results
+print(f"MLP Accuracy: {accuracy_mlp:.3f}")
+print("Classification Report:")
+print(class_report_mlp)
+
+# Extreme Gradient Boosting
+# Initialize the XGBoost classifier
+xgb_model = XGBClassifier(random_state=42, use_label_encoder=False, eval_metric='logloss')
+
+# Train the model
+xgb_model.fit(X_train, y_train)
+
+# Make predictions on the test set
+y_pred_xgb = xgb_model.predict(X_test)
+
+# Evaluate the model
+accuracy_xgb = accuracy_score(y_test, y_pred_xgb)
+class_report_xgb = classification_report(y_test, y_pred_xgb)
+
+# Output the evaluation results
+print(f"XGBoost Accuracy: {accuracy_xgb:.3f}")
+print("Classification Report:")
+print(class_report_xgb)
+
+# Hyperparameter Tuning for XGBoost
+# Define the parameter grid to search 
+param_grid = {
+    'n_estimators': [50, 100, 150],  
+    'learning_rate': [0.01, 0.1, 0.2, 0.3], 
+    'max_depth': [3, 4, 5, 6, 7],  
+    'gamma': [0, 0.1, 0.2],  
+    'min_child_weight': [1, 2, 3]  
+}
+
+# Initialize GridSearchCV
+grid_search = GridSearchCV(
+    estimator=xgb_model,
+    param_grid=param_grid,
+    scoring='accuracy',
+    cv=3,
+    n_jobs=-1,
+    verbose=0
+)
+
+# Perform the grid search on the training data
+grid_search.fit(X_train, y_train)
+
+# Get the best parameters and the best estimator
+best_params = grid_search.best_params_
+best_model = grid_search.best_estimator_
+
+# Make predictions with the best model on the test set
+y_pred_best = best_model.predict(X_test)
+
+# Evaluate the model
+accuracy_best = accuracy_score(y_test, y_pred_best)
+class_report_best = classification_report(y_test, y_pred_best)
+
+# Output the evaluation results
+print(f"Best Parameters: {best_params}")
+print(f"Accuracy with Best Parameters: {accuracy_best:.3f}")
+print("Classification Report:")
+print(class_report_best)
 
 # Compare models performance
-Models = ['Decision Tree', 'Random Forest', 'XBG', 'SVC', 'KNeighbors', 'MLP']
-Scores = [model_1_score, model_2_score, model_3_score, model_4_score, model_5_score, model_6_score]
+Models = [
+    'Logistic Regression', 
+    'KNN', 
+    'Decision Tree', 
+    'Random Forest', 
+    'SVM', 
+    'MLP', 
+    'XBG', 
+    'XGBoost (Tuned)'
+]
 
-performance = pd.DataFrame(list(zip(Models, Scores)), columns=['Models', 'Accuracy_score']).sort_values(
-    'Accuracy_score',
-    ascending=False)
+Scores = [
+    accuracy_logistic, 
+    accuracy_knn, 
+    accuracy_tree, 
+    accuracy_random_forest, 
+    accuracy_svm, 
+    accuracy_mlp, 
+    accuracy_xgb, 
+    accuracy_best
+]
+
+# Create a DataFrame for better visual comparison
+performance = pd.DataFrame(
+    list(zip(Models, Scores)), 
+    columns = ['Models', 'Accuracy_score']
+).sort_values('Accuracy_score', ascending=False)
+
+# Round the accuracy scores for better readability
+performance['Accuracy_score'] = performance['Accuracy_score'].round(3)
+
+# Display the performance DataFrame
 print(performance)
