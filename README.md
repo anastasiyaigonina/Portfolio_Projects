@@ -1,6 +1,6 @@
 # Portfolio_Projects
 
-This repository contains a collection of my projects, each showcasing my passion for data analysis. These projects encompass a wide range of data analysis tools and programming languages, offering a glimpse into my diverse skill set and problem-solving abilities. Each project is a unique journey, providing insightful solutions to real-world challenges.
+This repository contains a collection of my projects, each showcasing my passion for data analysis. These projects, recognized on Kaggle (bronze medals, over 9,000 views, 200+ forks), demonstrate my skills across various data analysis tools, programming languages, and problem-solving abilities. Each project is a unique journey, providing insightful solutions to real-world challenges.
 
 ## [Diabetes: EDA, hypothesis testing, predictions with Python](https://github.com/anastasiyaigonina/Portfolio_Projects/tree/main/diabetes_hypothesis_predictions)
 
