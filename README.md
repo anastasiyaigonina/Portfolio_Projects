@@ -13,8 +13,8 @@ Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/diabetes-eda-hypo
 
 ## [Reviews: Sentiment, Topic Modeling, Clustering with Python](https://github.com/anastasiyaigonina/Portfolio_Projects/tree/main/reviews_sentiment_topic_modeling)
 
-* Analyzed 20k hotel reviews using data analysis techniques, sentiment analysis, prediction modeling, topic modeling, and negative reviews clustering.
-* Achieved high accuracy of up to 85% in sentiment prediction, providing deep insights into customer feedback to boost satisfaction. Identified key topics in reviews, allowing targeted improvements in services and facilities to meet customer expectations.
+* Analyzed 20k hotel reviews with advanced data analysis techniques, including sentiment analysis, prediction modeling, topic modeling, and negative reviews clustering. 
+* Achieved a high accuracy of 85% in sentiment prediction, providing deep insights into customer feedback to boost satisfaction. Identified key topics in reviews, allowing targeted improvements in services and facilities to meet customer expectations.
 
 Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/reviews-sentiment-topic-modeling-clustering 
 
@@ -32,7 +32,7 @@ Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/retail-sales-eda-
 ## [Real Estate Data Analysis using SQL](https://github.com/anastasiyaigonina/Portfolio_Projects/tree/main/real_estate_data_analysis_sql)
 
 * Conducted in-depth analysis of US real estate data (200k+ entries) using SQL, applying various techniques such as group by, joins, subqueries, and window functions to uncover insights on property prices, trends, and geographical distribution.
-* Created an interactive Tableau dashboard to visualize findings, providing a clearer understanding of market dynamics and supporting data-driven decision-making.
+* Created an interactive Tableau dashboard to visualize findings, providing a clear understanding of market dynamics and supporting data-driven decision-making.
 
 Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/real-estate-data-analysis-using-sql
 
@@ -49,7 +49,7 @@ Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/cyclistic-case-st
 
 ## [Insurance Charges: Exploratory Data Analysis and Predictions with R](https://github.com/anastasiyaigonina/Portfolio_Projects/tree/main/insurance_charges_prediction)
 
-* Performed comprehensive exploratory data analysis on insurance charges, exploring variable distributions and correlations to identify key cost drivers and their impacts.
+* Performed comprehensive exploratory data analysis on insurance charges, examining variable distributions and correlations to identify key cost drivers and their impacts.
 * Developed a robust linear regression model with an accuracy of 86% in predicting insurance charges, supporting data-driven decision-making and cost optimization strategies for insurance providers.
 
 Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/insurance-charges-eda-and-predictions-with-r/
