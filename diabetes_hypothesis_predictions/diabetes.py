@@ -4,18 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 from scipy.stats import chi2_contingency
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.feature_selection import SelectKBest, chi2 
-from imblearn.under_sampling import NearMiss
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
-from sklearn.svm import SVC
-from sklearn.neural_network import MLPClassifier
-from sklearn.neighbors import KNeighborsClassifier
 
 # Load the dataset
 df = pd.read_csv('diabetes_binary_health_indicators_BRFSS2015.csv')
@@ -60,7 +48,7 @@ ax.set_xticklabels(['No diabetes', 'Diabetic'])
 plt.ylim(15, 60)
 plt.show()
 
-# There are some binary columns that we can visualy compare data between no-diabetes and diabetics.
+# There are some binary columns that we can visually compare data between no-diabetes and diabetics.
 # Lets iterate from those columns and build plots in one go.
 
 col_names = ['HighChol', 'HighBP', 'Smoker', 'HvyAlcoholConsump', 'PhysActivity', 'DiffWalk']
@@ -182,7 +170,7 @@ ax.legend(['No High BP', 'High BP'])
 plt.title('High blood pressure proportion across diabetics and no-diabetes')
 plt.show()
 
-## Chi2 test for testing relationships between two categorical variables
+# Chi2 test for testing relationships between two categorical variables
 chi2, p_value_4, dof, exp_freq = chi2_contingency(contingency2)
 if p_value_4 < 0.05:
     print('Reject Null Hypothesis')
@@ -193,6 +181,20 @@ else:
 # Feature selection 
 
 # Define features and target
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.feature_selection import SelectKBest, chi2 
+from imblearn.under_sampling import NearMiss
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from xgboost import XGBClassifier
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+
+df = pd.read_csv('diabetes_binary_health_indicators_BRFSS2015.csv')
 X = df.drop('Diabetes_binary', axis=1) 
 y = df['Diabetes_binary']
 
