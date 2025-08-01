@@ -4,6 +4,19 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 from scipy.stats import chi2_contingency
+from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import SelectKBest, f_classif
+from imblearn.under_sampling import EditedNearestNeighbours, TomekLinks
+from imblearn.over_sampling import SMOTE, RandomOverSampler
+from sklearn.preprocessing import RobustScaler, OrdinalEncoder
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+from sklearn.compose import ColumnTransformer
+from imblearn.pipeline import Pipeline as ImbPipeline
 
 # Load the dataset
 df = pd.read_csv('diabetes_binary_health_indicators_BRFSS2015.csv')
@@ -178,262 +191,176 @@ else:
     print('Failed to reject Null Hypothesis')
 
 # Predictions
-# Feature selection 
+df = pd.read_csv('diabetes_binary_health_indicators_BRFSS2015.csv')
+# Feature engineering
+# BMI Categories
+def bmi_category(bmi):
+    if bmi < 18.5:
+        return 'Underweight'
+    elif bmi < 25:
+        return 'Normal'
+    elif bmi < 30:
+        return 'Overweight'
+    else:
+        return 'Obese'
+
+
+df['BMI_cat'] = df['BMI'].apply(bmi_category)
+
+# BMI x Age (Age is coded 1-13, higher = older age group)
+df['BMI_Age_interaction'] = df['BMI'] * df['Age']
+
+# High_risk group: Obese + Age 10+ (65+ per BRFSS age codes)
+df['HighRisk_Obese_Old'] = ((df['BMI_cat'] == 'Obese') & (df['Age'] >= 10)).astype(int)
+
+# Convert BMI_cat to ordinal codes 
+df['BMI_cat_code'] = pd.Categorical(df['BMI_cat'], 
+                                    categories=['Underweight','Normal','Overweight','Obese'],
+                                    ordered=True).codes
+df = df.drop(columns=['BMI_cat'])
+
+# Train-test split
 
 # Define features and target
-from sklearn.model_selection import train_test_split, GridSearchCV
-from sklearn.feature_selection import SelectKBest, chi2 
-from imblearn.under_sampling import NearMiss
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, classification_report
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
-from sklearn.svm import SVC
-from sklearn.neural_network import MLPClassifier
-from sklearn.neighbors import KNeighborsClassifier
-
-df = pd.read_csv('diabetes_binary_health_indicators_BRFSS2015.csv')
 X = df.drop('Diabetes_binary', axis=1) 
 y = df['Diabetes_binary']
 
-# Feature selection using SelectKBest with Chi-Square
-selector = SelectKBest(score_func=chi2, k=12)
-X_new = selector.fit_transform(X, y)
+# Splitting the data into training and testing sets, while preserving class distribution using stratify=y
+X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2, random_state=42)
 
-# Get the selected feature indices
-selected_columns = selector.get_support(indices=True)
-important_features = X.columns[selected_columns].tolist()
+# Preprocessing and feature selection
+# Specify the feature types for preprocessing
+numeric_features = ['BMI', 'BMI_Age_interaction', 'MentHlth', 'PhysHlth']
+categorical_features = ['Age','Education', 'Income', 'GenHlth', 'BMI_cat_code']
 
-# Display the selected features
-print(important_features)
 
-# Create a DataFrame for the selected features
-X_selected = pd.DataFrame(X_new, columns=important_features)
-
-# Handling class imbalance
-
-# Handling class imbalance using NearMiss to undersample the majority class
-nm = NearMiss(version = 1 , n_neighbors = 10)
-X_sm,y_sm= nm.fit_resample(X_selected,y)
-
-# Splitting the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_sm, y_sm, test_size=0.2, random_state=42)
-
-# Scaling 
-
-# Standardizing the features (important for models sensitive to feature scaling)
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-
-# Modeling
-
-# Lets start with Logistic Regression
-# Creating and training the logistic regression model
-logistic_model = LogisticRegression(random_state=42, max_iter=200)
-
-# Train model using scaled data
-logistic_model.fit(X_train_scaled, y_train)
-
-# Making predictions on the test set
-y_pred_logistic = logistic_model.predict(X_test_scaled)
-
-# Evaluating the model
-accuracy_logistic = accuracy_score(y_test, y_pred_logistic)
-class_report_logistic = classification_report(y_test, y_pred_logistic)
-
-# Output the evaluation results
-print(f"Accuracy of Logistic Regression Model: {accuracy_logistic:.3f}")
-print("Classification Report:")
-print(class_report_logistic)
-
-# K-Neighbors
-# Initialize the KNN classifier with a specified number of neighbors (k)
-knn_model = KNeighborsClassifier(n_neighbors=5)
-
-# Train the model on scaled data to improve performance
-knn_model.fit(X_train_scaled, y_train)
-
-# Make predictions on the test set
-y_pred_knn = knn_model.predict(X_test_scaled)
-
-# Evaluate the model
-accuracy_knn = accuracy_score(y_test, y_pred_knn)
-class_report_knn = classification_report(y_test, y_pred_knn)
-
-# Output the evaluation results
-print(f"KNN Accuracy: {accuracy_knn:.3f}")
-print("Classification Report:")
-print(class_report_knn)
-
-# Decision Tree
-# Initialize the Decision Tree classifier
-decision_tree_model = DecisionTreeClassifier(random_state=42, max_depth= 12)
-
-# Train the model
-decision_tree_model.fit(X_train, y_train)
-
-# Make predictions on the test set
-y_pred_tree = decision_tree_model.predict(X_test)
-
-# Evaluate the model
-accuracy_tree = accuracy_score(y_test, y_pred_tree)
-class_report_tree = classification_report(y_test, y_pred_tree)
-
-# Output the evaluation results
-print(f"Decision Tree Accuracy: {accuracy_tree:.3f}")
-print("Classification Report:")
-print(class_report_tree)
-
-# Random Forest
-# Building the Random Forest model
-random_forest_model = RandomForestClassifier(n_estimators=100, max_depth=12, random_state=42)
-
-# Train the model 
-random_forest_model.fit(X_train, y_train)
-
-# Making predictions on the test set
-y_pred_random_forest = random_forest_model.predict(X_test)
-
-# Evaluating the model
-accuracy_random_forest = accuracy_score(y_test, y_pred_random_forest)
-class_report_random_forest = classification_report(y_test, y_pred_random_forest)
-
-# Output the evaluation results
-print(f"Accuracy for Random Forest: {accuracy_random_forest:.3f}")
-print("Classification Report:")
-print(class_report_random_forest)
-
-# Support Vector Machine
-# Building the SVM model
-svm_model = SVC(random_state=42, C=1.0)  
-
-# Train using scaled data
-svm_model.fit(X_train_scaled, y_train)
-
-# Making predictions on the test set
-y_pred_svm = svm_model.predict(X_test_scaled)
-
-# Evaluating the model
-accuracy_svm = accuracy_score(y_test, y_pred_svm)
-class_report_svm = classification_report(y_test, y_pred_svm)
-
-# Output the evaluation results
-print(f"Accuracy of SVM Model: {accuracy_svm:.3f}")
-print("Classification Report:")
-print(class_report_svm)
-
-# Multi-Layer Perceptron
-# Initialize the MLP classifier
-mlp_model = MLPClassifier(hidden_layer_sizes=(100, 50), max_iter=300, random_state=42)
-
-# Train the model using scaled data
-mlp_model.fit(X_train_scaled, y_train)
-
-# Make predictions on the test set
-y_pred_mlp = mlp_model.predict(X_test_scaled)
-
-# Evaluate the model
-accuracy_mlp = accuracy_score(y_test, y_pred_mlp)
-class_report_mlp = classification_report(y_test, y_pred_mlp)
-
-# Output the evaluation results
-print(f"MLP Accuracy: {accuracy_mlp:.3f}")
-print("Classification Report:")
-print(class_report_mlp)
-
-# Extreme Gradient Boosting
-# Initialize the XGBoost classifier
-xgb_model = XGBClassifier(random_state=42, use_label_encoder=False, eval_metric='logloss')
-
-# Train the model
-xgb_model.fit(X_train, y_train)
-
-# Make predictions on the test set
-y_pred_xgb = xgb_model.predict(X_test)
-
-# Evaluate the model
-accuracy_xgb = accuracy_score(y_test, y_pred_xgb)
-class_report_xgb = classification_report(y_test, y_pred_xgb)
-
-# Output the evaluation results
-print(f"XGBoost Accuracy: {accuracy_xgb:.3f}")
-print("Classification Report:")
-print(class_report_xgb)
-
-# Hyperparameter Tuning for XGBoost
-# Define the parameter grid to search 
-param_grid = {
-    'n_estimators': [50, 100, 150],  
-    'learning_rate': [0.01, 0.1, 0.2, 0.3], 
-    'max_depth': [3, 4, 5, 6, 7],  
-    'gamma': [0, 0.1, 0.2],  
-    'min_child_weight': [1, 2, 3]  
-}
-
-# Initialize GridSearchCV
-grid_search = GridSearchCV(
-    estimator=xgb_model,
-    param_grid=param_grid,
-    scoring='accuracy',
-    cv=3,
-    n_jobs=-1,
-    verbose=0
+# Build a preprocessing pipeline using ColumnTransformer to handle numerical and categorical features
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', RobustScaler(), numeric_features),
+        ('cat', OrdinalEncoder(), categorical_features),
+    ],
+    remainder='passthrough'
 )
 
-# Perform the grid search on the training data
-grid_search.fit(X_train, y_train)
+# Feature selection using ANOVA F-test (f_classif) to select the top 16 features
+feature_selector = SelectKBest(score_func=f_classif, k=16)
 
-# Get the best parameters and the best estimator
-best_params = grid_search.best_params_
-best_model = grid_search.best_estimator_
+# Training and evaluation
+# Class weights to address class imbalance 
+# Define models with class_weight
+weighted_models = {
+    "Logistic Regression": LogisticRegression(random_state=42, max_iter=200, class_weight='balanced'),
+    "Decision Tree": DecisionTreeClassifier(random_state=42, max_depth=12, class_weight='balanced'),
+    "Random Forest": RandomForestClassifier(n_estimators=100, max_depth=12, random_state=42, class_weight='balanced'),
+    "LightGBM": LGBMClassifier(random_state=42, class_weight='balanced', n_estimators=250, verbose=-1)
+}
 
-# Make predictions with the best model on the test set
-y_pred_best = best_model.predict(X_test)
+# List to store results
+results = []
 
-# Evaluate the model
-accuracy_best = accuracy_score(y_test, y_pred_best)
-class_report_best = classification_report(y_test, y_pred_best)
+for model_name, base_model in weighted_models.items():
+        steps = [
+            ('preprocessor', preprocessor),
+            ('feature_selection', feature_selector),
+            ('classifier', base_model)
+        ]
 
-# Output the evaluation results
-print(f"Best Parameters: {best_params}")
-print(f"Accuracy with Best Parameters: {accuracy_best:.3f}")
-print("Classification Report:")
-print(class_report_best)
+        # Build pipeline
+        clf = ImbPipeline(steps=steps)
 
-# Compare models performance
-Models = [
-    'Logistic Regression', 
-    'KNN', 
-    'Decision Tree', 
-    'Random Forest', 
-    'SVM', 
-    'MLP', 
-    'XBG', 
-    'XGBoost (Tuned)'
-]
+        # Fit
+        clf.fit(X_train, y_train)
 
-Scores = [
-    accuracy_logistic, 
-    accuracy_knn, 
-    accuracy_tree, 
-    accuracy_random_forest, 
-    accuracy_svm, 
-    accuracy_mlp, 
-    accuracy_xgb, 
-    accuracy_best
-]
+        # Predict
+        y_pred = clf.predict(X_test)
+        y_pred_proba = clf.predict_proba(X_test)[:, -1] if hasattr(clf.named_steps['classifier'], "predict_proba") else None
 
-# Create a DataFrame for better visual comparison
-performance = pd.DataFrame(
-    list(zip(Models, Scores)), 
-    columns = ['Models', 'Accuracy_score']
-).sort_values('Accuracy_score', ascending=False)
+        # Evaluate
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average='weighted')
+        recall = recall_score(y_test, y_pred, average='weighted')
+        f1 = f1_score(y_test, y_pred, average='weighted')
+        auc = roc_auc_score(y_test, y_pred_proba) if y_pred_proba is not None else np.nan
 
-# Round the accuracy scores for better readability
-performance['Accuracy_score'] = performance['Accuracy_score'].round(3)
+        # Store results
+        results.append({
+            "Model": model_name,
+            "Accuracy": round(accuracy, 3),
+            "Precision": round(precision, 3),
+            "Recall": round(recall, 3),
+            "F1 Score": round(f1, 3),
+            "AUC Score": round(auc, 3),
+        })
+    
+# Convert results to DataFrame
+results_df = pd.DataFrame(results)
+print(results_df)
 
-# Display the performance DataFrame
-print(performance)
+# Sampling techniques to handle class imbalance
+
+# Define sampling techniques
+sampling_methods = {
+    "RandomOverSampler": RandomOverSampler(random_state=42),
+    "SMOTE": SMOTE(random_state=42),
+    "EditedNN": EditedNearestNeighbours(n_neighbors=3),
+    "TomekLinks": TomekLinks(),
+}
+
+# Define models
+models = {
+    "Logistic Regression": LogisticRegression(random_state=42, max_iter=200),
+    "Decision Tree": DecisionTreeClassifier(random_state=42, max_depth=12),
+    "Random Forest": RandomForestClassifier(n_estimators=100, max_depth=12, random_state=42),
+    "LGBM": LGBMClassifier(random_state=42, n_estimators=250, verbose=-1),
+    "Gradient Boosting": GradientBoostingClassifier(n_estimators = 250),
+    "XGB": XGBClassifier(random_state=42, use_label_encoder=False, eval_metric='logloss'),
+} 
+
+# List to store results
+results2 = []
+
+# Iterate through all combinations of sampling techniques and classification models
+for method_name, sampler in sampling_methods.items():
+    for model_name, base_model in models.items():
+        steps = [
+            ('preprocessor', preprocessor),
+            ('sampler', sampler),
+            ('feature_selection', feature_selector),
+            ('classifier', base_model)
+        ]
+
+        # Build pipeline
+        clf = ImbPipeline(steps=steps)
+
+        # Fit
+        clf.fit(X_train, y_train)
+
+        # Predict
+        y_pred = clf.predict(X_test)
+        y_pred_proba = clf.predict_proba(X_test)[:, -1] if hasattr(clf.named_steps['classifier'], "predict_proba") else None
+
+        # Evaluate
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average='weighted')
+        recall = recall_score(y_test, y_pred, average='weighted')
+        f1 = f1_score(y_test, y_pred, average='weighted')
+        auc = roc_auc_score(y_test, y_pred_proba) if y_pred_proba is not None else np.nan
+
+        # Store results
+        results2.append({
+            "Sampling Method": method_name,
+            "Model": model_name,
+            "Accuracy": round(accuracy, 3),
+            "Precision": round(precision, 3),
+            "Recall": round(recall, 3),
+            "F1 Score": round(f1, 3),
+            "AUC Score": round(auc, 3),
+        })
+
+
+# Convert results to DataFrame
+results_df2 = pd.DataFrame(results2)
+results_df2.style\
+    .apply(lambda row: ['background-color: seagreen']*len(row) if row['Accuracy'] == results_df2['Accuracy'].max() else ['']*len(row), axis=1)\
+    .format(precision=3)
