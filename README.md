@@ -1,11 +1,11 @@
 # Portfolio_Projects
 
-This repository contains a collection of my projects, each showcasing my passion for data analysis. These projects, recognized on Kaggle (silver medals, over 10,000 views, 200+ forks), demonstrate my skills across various data analysis tools, programming languages, and problem-solving abilities. Each project is a unique journey, providing insightful solutions to real-world challenges.
+This repository contains a collection of my projects, each showcasing my passion for data analysis. These projects, recognized on Kaggle (bronze medals, over 15,000 views, 300+ forks), demonstrate my skills across various data analysis tools, programming languages, and problem-solving abilities. Each project is a unique journey, providing insightful solutions to real-world challenges.
 
 ## [Diabetes: EDA, hypothesis testing, predictions with Python](https://github.com/anastasiyaigonina/Portfolio_Projects/tree/main/diabetes_hypothesis_predictions)
 
-* Conducted comprehensive analysis of more than 250k diabetes medical data, utilizing exploratory data analysis (EDA) and hypothesis testing to identify key factors impacting diabetes.
-* Developed and evaluated multiple predictive models to accurately determine diabetes status, with the best-performing model achieving an accuracy of 90%, enhancing early detection, treatment, and management of diabetes.
+* Conducted comprehensive analysis of more than 250k medical records, utilizing exploratory data analysis (EDA) and hypothesis testing to identify key factors impacting diabetes.
+* Built and evaluated multiple predictive models using pipelines and resampling techniques to address class imbalance. The best-performing ensemble models achieved up to 86% accuracy and AUC values around 0.82, supporting early detection and improved management of diabetes.
 
 Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/diabetes-eda-hypothesis-testing-predictions
 
