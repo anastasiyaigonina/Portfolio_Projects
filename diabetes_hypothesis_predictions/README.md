@@ -1,6 +1,6 @@
 # Diabetes: EDA, hypothesis testing, predictions with Python
 
-This project focuses on the analysis of diabetes medical data and building predictive models to predict diabetes status. It includes exploratory data analysis (EDA), hypothesis testing, observations, and the development of various models to predict the presence or absence of diabetes.
+This project focuses on analyzing diabetes medical data and developing predictive models for diabetes status. The workflow includes exploratory data analysis (EDA), hypothesis testing, and feature engineering, followed by the implementation and evaluation of multiple classification models. To address class imbalance and improve model performance, various resampling techniques and class weighting strategies are applied.
 
 This repository contains data used for the project, Jupiter Notebook as long as Python script. 
 
