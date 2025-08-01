@@ -5,7 +5,7 @@ This repository contains a collection of my projects, each showcasing my passion
 ## [Diabetes: EDA, hypothesis testing, predictions with Python](https://github.com/anastasiyaigonina/Portfolio_Projects/tree/main/diabetes_hypothesis_predictions)
 
 * Conducted comprehensive analysis of more than 250k medical records, utilizing exploratory data analysis (EDA) and hypothesis testing to identify key factors impacting diabetes.
-* Built and evaluated multiple predictive models using pipelines and resampling techniques to address class imbalance. The best-performing ensemble models achieved up to 86% accuracy and AUC values around 0.82, supporting early detection and improved management of diabetes.
+* Built and evaluated multiple predictive models for diabetes classification, using pipelines and resampling techniques to address class imbalance. The best-performing ensemble models achieved up to 86% accuracy and AUC values around 0.82, supporting early detection and improved management of diabetes.
 
 Kaggle notebook: https://www.kaggle.com/code/anastasiyaigonina/diabetes-eda-hypothesis-testing-predictions
 
