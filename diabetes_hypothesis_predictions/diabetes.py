@@ -361,6 +361,4 @@ for method_name, sampler in sampling_methods.items():
 
 # Convert results to DataFrame
 results_df2 = pd.DataFrame(results2)
-results_df2.style\
-    .apply(lambda row: ['background-color: seagreen']*len(row) if row['Accuracy'] == results_df2['Accuracy'].max() else ['']*len(row), axis=1)\
-    .format(precision=3)
+print(results_df2)
